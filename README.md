@@ -166,7 +166,7 @@ flowchart TD
     subgraph ClientLayer["Client Layer (Browser / Mobile)"]
         Buyer["Buyer / Visitor"]
         Artisan["Artisan / Seller"]
-        LocalStore[("Browser LocalStorage (Cart Data)")]
+        LocalStore[("Browser LocalStorage: Cart Data")]
     end
 
     subgraph AppLayer["Next.js 14 Frontend Application"]
@@ -181,14 +181,14 @@ flowchart TD
 
     subgraph SupabasePlatform["Supabase Managed Cloud Platform"]
         AuthSvc["Supabase GoTrue Auth Service"]
-        StorageSvc["Supabase Storage Engine ('images' bucket)"]
+        StorageSvc["Supabase Storage Engine: images bucket"]
         PostgREST["Supabase PostgREST Gateway & RLS Enforcement"]
         
         subgraph PostgresDB["PostgreSQL Database"]
-            T_Artisans[(artisans)]
-            T_Products[(products)]
-            T_Orders[(orders)]
-            T_OrderItems[(order_items)]
+            T_Artisans[("artisans")]
+            T_Products[("products")]
+            T_Orders[("orders")]
+            T_OrderItems[("order_items")]
         end
     end
 
@@ -201,7 +201,7 @@ flowchart TD
     Buyer --> ProductView
     Buyer --> CartCheckout
     Buyer --> OrderView
-    Buyer -.->|Share Craft Link| WhatsApp
+    Buyer -.->|"Share Craft Link"| WhatsApp
 
     Artisan --> ArtisanAuth
     Artisan --> ArtisanDashboard
@@ -210,15 +210,15 @@ flowchart TD
     ProductView <--> CartCtx
     CartCtx <--> LocalStore
 
-    ArtisanAuth -->|Login / Signup| AuthSvc
-    ArtisanDashboard -->|Upload Photos & Audio| StorageSvc
-    ProductView -->|Fetch Photos & Stream Voice Note| StorageSvc
+    ArtisanAuth -->|"Login / Signup"| AuthSvc
+    ArtisanDashboard -->|"Upload Photos & Audio"| StorageSvc
+    ProductView -->|"Fetch Photos & Stream Voice Note"| StorageSvc
 
-    CatalogView -->|Read Products + Artisans| PostgREST
-    ProductView -->|Read Product By ID| PostgREST
-    CartCheckout -->|Insert Order & Items| PostgREST
-    OrderView -->|Read Order Confirmation| PostgREST
-    ArtisanDashboard -->|CRUD Products & Update Item Status| PostgREST
+    CatalogView -->|"Read Products + Artisans"| PostgREST
+    ProductView -->|"Read Product By ID"| PostgREST
+    CartCheckout -->|"Insert Order & Items"| PostgREST
+    OrderView -->|"Read Order Confirmation"| PostgREST
+    ArtisanDashboard -->|"CRUD Products & Update Item Status"| PostgREST
 
     PostgREST --> PostgresDB
     PostgresDB --- T_Artisans
@@ -235,55 +235,55 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([User Visits KaustiKart]) --> RoleCheck{User Persona?}
+    Start(["User Visits KaustiKart"]) --> RoleCheck{"User Persona?"}
     
     %% Buyer Branch
-    RoleCheck -->|Buyer / Visitor| BrowseCatalog[Browse Catalog at /]
-    BrowseCatalog --> FilterAction[Filter by Craft, Price, Village, or Search Keyword]
-    FilterAction --> SelectProduct[Select Product Card]
-    SelectProduct --> ViewDetails[View Details: Price, Materials, Time, Craft Story]
-    ViewDetails --> PlayVoice{Play Voice Note?}
-    PlayVoice -->|Yes| ListenAudio[Listen to Artisan Voice Note via Audio Player]
+    RoleCheck -->|"Buyer / Visitor"| BrowseCatalog["Browse Catalog at /"]
+    BrowseCatalog --> FilterAction["Filter by Craft, Price, Village, or Search Keyword"]
+    FilterAction --> SelectProduct["Select Product Card"]
+    SelectProduct --> ViewDetails["View Details: Price, Materials, Time, Craft Story"]
+    ViewDetails --> PlayVoice{"Play Voice Note?"}
+    PlayVoice -->|Yes| ListenAudio["Listen to Artisan Voice Note via Audio Player"]
     PlayVoice -->|No| AddCart
-    ListenAudio --> AddCart[Click 'Add to cart']
-    AddCart --> CartState[Item Saved to LocalStorage via CartProvider]
-    CartState --> OpenCart[Navigate to /cart]
-    OpenCart --> ReviewItems[Review Items & Enter Delivery Details: Name, WhatsApp Phone, Address]
-    ReviewItems --> SubmitOrder[Click 'Pay (demo)']
-    SubmitOrder --> MockGateway[Simulate Payment Gateway: 900ms delay]
-    MockGateway --> GenUUID[Generate Secure Random Order UUID]
-    GenUUID --> InsertDB[Write Order & Order Items to Supabase]
-    InsertDB --> ClearCart[Clear LocalStorage Cart]
-    ClearCart --> OrderConfirmation[Redirect to /order/:id with Confirmation & Status]
+    ListenAudio --> AddCart["Click Add to cart"]
+    AddCart --> CartState["Item Saved to LocalStorage via CartProvider"]
+    CartState --> OpenCart["Navigate to /cart"]
+    OpenCart --> ReviewItems["Review Items and Enter Delivery Details"]
+    ReviewItems --> SubmitOrder["Click Pay (demo)"]
+    SubmitOrder --> MockGateway["Simulate Payment Gateway: 900ms delay"]
+    MockGateway --> GenUUID["Generate Secure Random Order UUID"]
+    GenUUID --> InsertDB["Write Order and Order Items to Supabase"]
+    InsertDB --> ClearCart["Clear LocalStorage Cart"]
+    ClearCart --> OrderConfirmation["Redirect to /order/:id with Confirmation"]
 
     %% Artisan Branch
-    RoleCheck -->|Artisan| AuthPage[Navigate to /dashboard -> Redirected to /login]
-    AuthPage --> AuthAction{Action?}
-    AuthAction -->|Sign In| SubmitSignIn[Enter Email & Password]
-    AuthAction -->|Sign Up| SubmitSignUp[Register New Account]
-    SubmitSignIn --> VerifyAuth[Supabase Auth Validates Credentials]
+    RoleCheck -->|Artisan| AuthPage["Navigate to /dashboard -> Redirected to /login"]
+    AuthPage --> AuthAction{"Action?"}
+    AuthAction -->|"Sign In"| SubmitSignIn["Enter Email and Password"]
+    AuthAction -->|"Sign Up"| SubmitSignUp["Register New Account"]
+    SubmitSignIn --> VerifyAuth["Supabase Auth Validates Credentials"]
     SubmitSignUp --> VerifyAuth
-    VerifyAuth --> CheckProfile{Artisan Profile Exists?}
-    CheckProfile -->|No| FillProfile[Complete ProfileForm: Name, Phone, Village, Craft, Bio, Photo]
-    FillProfile --> SaveProfile[Upsert to artisans table]
-    CheckProfile -->|Yes| DashboardView[Display Artisan Dashboard]
+    VerifyAuth --> CheckProfile{"Artisan Profile Exists?"}
+    CheckProfile -->|No| FillProfile["Complete Profile: Name, Phone, Village, Craft, Bio, Photo"]
+    FillProfile --> SaveProfile["Upsert to artisans table"]
+    CheckProfile -->|Yes| DashboardView["Display Artisan Dashboard"]
     SaveProfile --> DashboardView
 
-    DashboardView --> ArtisanAction{Artisan Operation?}
-    ArtisanAction -->|Add / Edit Product| ProductForm[Open ProductForm]
-    ProductForm --> UploadMedia[Upload Photos & Voice Note to Supabase Storage]
-    UploadMedia --> SaveProduct[Insert / Update products table with artisan_id]
+    DashboardView --> ArtisanAction{"Artisan Operation?"}
+    ArtisanAction -->|"Add / Edit Product"| ProductForm["Open ProductForm"]
+    ProductForm --> UploadMedia["Upload Photos and Voice Note to Supabase Storage"]
+    UploadMedia --> SaveProduct["Insert / Update products table with artisan_id"]
     SaveProduct --> DashboardView
 
-    ArtisanAction -->|Manage Orders| ViewOrders[Inspect 'Orders received' List]
-    ViewOrders --> UpdateStatus{Current Status?}
-    UpdateStatus -->|Placed| AcceptOrder[Click 'Accept' -> Set status='Accepted']
-    UpdateStatus -->|Accepted| CompleteOrder[Click 'Mark completed' -> Set status='Completed']
-    AcceptOrder --> UpdateItemDB[Update order_items in Supabase]
+    ArtisanAction -->|"Manage Orders"| ViewOrders["Inspect Orders received List"]
+    ViewOrders --> UpdateStatus{"Current Status?"}
+    UpdateStatus -->|Placed| AcceptOrder["Click Accept -> Set status = Accepted"]
+    UpdateStatus -->|Accepted| CompleteOrder["Click Mark completed -> Set status = Completed"]
+    AcceptOrder --> UpdateItemDB["Update order_items in Supabase"]
     CompleteOrder --> UpdateItemDB
     UpdateItemDB --> DashboardView
 
-    ArtisanAction -->|Sign Out| SignOut[Supabase Auth SignOut -> Redirect to /]
+    ArtisanAction -->|"Sign Out"| SignOut["Supabase Auth SignOut -> Redirect to /"]
 ```
 
 ---
@@ -295,22 +295,22 @@ flowchart TD
 ```mermaid
 flowchart LR
     subgraph BuyerJourney["Buyer Journey"]
-        B1["Discover Products<br/>(Filter by craft & village)"] --> B2["Inspect Product<br/>(Read story & hear voice)"]
-        B2 --> B3["Add to Cart<br/>(Cart badge updates)"]
-        B3 --> B4["Provide Shipping Details<br/>(Name, Phone, Address)"]
-        B4 --> B5["Simulate Payment<br/>(Instant zero-risk checkout)"]
-        B5 --> B6["Track Order<br/>(Unique URL with live item status)"]
+        B1["Discover Products<br/>Filter by craft and village"] --> B2["Inspect Product<br/>Read story and hear voice"]
+        B2 --> B3["Add to Cart<br/>Cart badge updates"]
+        B3 --> B4["Provide Shipping Details<br/>Name, Phone, Address"]
+        B4 --> B5["Simulate Payment<br/>Instant zero-risk checkout"]
+        B5 --> B6["Track Order<br/>Unique URL with live item status"]
     end
 
     subgraph ArtisanJourney["Artisan Journey"]
-        A1["Sign In / Register<br/>(Email & Password)"] --> A2["Set Up Profile<br/>(Village, Craft, Bio, Photo)"]
-        A2 --> A3["Publish Craft<br/>(Upload photos, story & audio)"]
-        A3 --> A4["Receive Orders<br/>(Buyer shipping info displayed)"]
-        A4 --> A5["Fulfill Items<br/>(Placed -> Accepted -> Completed)"]
+        A1["Sign In / Register<br/>Email and Password"] --> A2["Set Up Profile<br/>Village, Craft, Bio, Photo"]
+        A2 --> A3["Publish Craft<br/>Upload photos, story and audio"]
+        A3 --> A4["Receive Orders<br/>Buyer shipping info displayed"]
+        A4 --> A5["Fulfill Items<br/>Placed to Accepted to Completed"]
     end
 
-    B5 -.->|Triggers Order Creation| A4
-    A5 -.->|Status Updates Reflected on| B6
+    B5 -.->|"Triggers Order Creation"| A4
+    A5 -.->|"Status Updates Reflected on"| B6
 ```
 
 ---
@@ -325,27 +325,27 @@ Artisans manage their identity through Supabase GoTrue Auth. The authentication 
 sequenceDiagram
     autonumber
     actor Artisan as Artisan
-    participant App as Next.js (/login & /dashboard)
+    participant App as Next.js Web App
     participant Auth as Supabase Auth
-    participant DB as Postgres (artisans table)
+    participant DB as PostgreSQL Database
 
-    Artisan->>App: Submits Email & Password
-    alt Mode == "up" (Sign Up)
-        App->>Auth: supabase.auth.signUp({ email, password })
+    Artisan->>App: Submits Email and Password
+    alt Sign Up Mode
+        App->>Auth: supabase.auth.signUp()
         Auth-->>App: Session / User Created
-    else Mode == "in" (Sign In)
-        App->>Auth: supabase.auth.signInWithPassword({ email, password })
-        Auth-->>App: Session & JWT Token Returned
+    else Sign In Mode
+        App->>Auth: supabase.auth.signInWithPassword()
+        Auth-->>App: Session and JWT Token Returned
     end
-    App->>App: Router pushes to /dashboard
+    App->>App: Router pushes to dashboard
     App->>Auth: supabase.auth.getSession()
     Auth-->>App: User ID (uid)
-    App->>DB: SELECT * FROM artisans WHERE id = uid
+    App->>DB: Query artisan profile by UID
     alt Profile Missing
         DB-->>App: null record
         App->>Artisan: Render ProfileForm (Name, Phone, Village, Craft, Bio, Photo)
         Artisan->>App: Submits Profile Details
-        App->>DB: UPSERT INTO artisans (id, name, phone, village, craft, bio, photo_url)
+        App->>DB: Upsert into artisans table
         DB-->>App: Profile Created
     else Profile Exists
         DB-->>App: Artisan Record
@@ -361,11 +361,11 @@ Artisans upload imagery and optional voice notes. Files are routed through `uplo
 sequenceDiagram
     autonumber
     actor Artisan as Artisan
-    participant Form as ProductForm (components/ProductForm.tsx)
-    participant Storage as Supabase Storage ('images' bucket)
-    participant DB as Postgres (products table)
+    participant Form as ProductForm Component
+    participant Storage as Supabase Storage Engine
+    participant DB as PostgreSQL Database
 
-    Artisan->>Form: Selects Product Images (multiple)
+    Artisan->>Form: Selects Product Images
     loop Each Image File
         Form->>Storage: upload(file, "products")
         Storage-->>Form: Returns publicUrl
@@ -376,10 +376,10 @@ sequenceDiagram
         Storage-->>Form: Returns publicUrl
     end
     Artisan->>Form: Fills Title, Price, Craft, Materials, Time, Craft Story
-    Artisan->>Form: Clicks 'Save product'
-    Form->>DB: INSERT / UPDATE INTO products (title, price, craft_type, description, materials, time_taken, story, voice_url, images, artisan_id)
+    Artisan->>Form: Clicks Save product
+    Form->>DB: Insert or Update Product Record
     DB-->>Form: Success Confirmation
-    Form->>Artisan: Redirects to /dashboard
+    Form->>Artisan: Redirects to dashboard
 ```
 
 ### C. Shopping Cart Management & Persistence
@@ -388,19 +388,19 @@ The shopping cart operates locally in the browser, ensuring immediate responsive
 
 ```mermaid
 flowchart TD
-    A[Buyer clicks 'Add to cart'] --> B{Item already in cart?}
-    B -->|Yes| C[Increment item.qty by 1]
-    B -->|No| D[Append item with qty = 1]
-    C --> E[Update CartProvider React State]
+    A["Buyer clicks Add to cart"] --> B{"Item already in cart?"}
+    B -->|Yes| C["Increment item qty by 1"]
+    B -->|No| D["Append item with qty = 1"]
+    C --> E["Update CartProvider React State"]
     D --> E
-    E --> F["Synchronize to localStorage ('cart')"]
-    F --> G[Header Cart Badge re-renders with total item count]
+    E --> F["Synchronize to localStorage"]
+    F --> G["Header Cart Badge updates total count"]
     
-    H[Buyer clicks 'Remove'] --> I[Filter out item by ID]
+    H["Buyer clicks Remove"] --> I["Filter out item by ID"]
     I --> E
     
-    J[Buyer completes checkout] --> K[Invoke clear]
-    K --> L["Set items = [] and localStorage.setItem('cart', '[]')"]
+    J["Buyer completes checkout"] --> K["Invoke clear"]
+    K --> L["Empty items and clear localStorage"]
 ```
 
 ### D. Guest Checkout & Order Processing
@@ -411,23 +411,23 @@ Guest checkout enables buyers to purchase without creating an account. The appli
 sequenceDiagram
     autonumber
     actor Buyer as Buyer
-    participant Cart as Cart Page (app/cart/page.tsx)
-    participant DB as Supabase Postgres
-    participant OrderPage as Order Confirmation (app/order/[id])
+    participant Cart as Cart Page
+    participant DB as PostgreSQL Database
+    participant OrderPage as Order Confirmation Page
 
     Buyer->>Cart: Enters Name, WhatsApp Phone, Address
-    Buyer->>Cart: Clicks 'Pay (demo)'
+    Buyer->>Cart: Clicks Pay (demo)
     Cart->>Cart: Simulate payment gateway processing (900ms)
-    Cart->>Cart: Generate order ID: crypto.randomUUID()
-    Cart->>DB: INSERT INTO orders (id, buyer_name, buyer_phone, address, total)
-    Cart->>DB: INSERT INTO order_items (order_id, product_id, artisan_id, title, price, qty)
-    DB-->>Cart: Confirmation (o.error == null && it.error == null)
+    Cart->>Cart: Generate order ID via crypto.randomUUID()
+    Cart->>DB: Insert Order Record (Name, Phone, Address, Total)
+    Cart->>DB: Insert Order Items Records
+    DB-->>Cart: Confirmation (No Errors)
     Cart->>Cart: Clear cart state and localStorage
-    Cart->>OrderPage: Redirect to /order/{id}
-    OrderPage->>DB: SELECT * FROM orders WHERE id = {id}
-    OrderPage->>DB: SELECT * FROM order_items WHERE order_id = {id}
-    DB-->>OrderPage: Return Order & Item Details
-    OrderPage->>Buyer: Display Order #UUID, Status Badges, and Delivery Address
+    Cart->>OrderPage: Redirect to order confirmation page
+    OrderPage->>DB: Fetch order record by ID
+    OrderPage->>DB: Fetch order items by order ID
+    DB-->>OrderPage: Return Order and Item Details
+    OrderPage->>Buyer: Display Order Summary and Status Badges
 ```
 
 ### E. Payment Workflow (Current Mock vs Planned Gateway)
@@ -435,19 +435,19 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     subgraph CurrentImplementation["Current Prototype Implementation"]
-        C1["Buyer clicks 'Pay (demo)'"] --> C2["await new Promise(r => setTimeout(r, 900))"]
+        C1["Buyer clicks Pay (demo)"] --> C2["Simulate 900ms delay"]
         C2 --> C3["Generate crypto.randomUUID()"]
-        C3 --> C4["Direct INSERT into orders & order_items"]
+        C3 --> C4["Direct INSERT into orders and order_items"]
         C4 --> C5["Redirect to /order/:id"]
     end
 
     subgraph ProductionPlan["Production Razorpay Integration Architecture"]
-        P1["Buyer clicks 'Pay Now'"] --> P2["Call Next.js API /api/checkout/create-order"]
+        P1["Buyer clicks Pay Now"] --> P2["Call Next.js API /api/checkout/create-order"]
         P2 --> P3["Server calls Razorpay Orders API with total amount"]
-        P3 --> P4["Open Razorpay Modal with order_id, UPI, Cards, Netbanking"]
-        P4 --> P5{Payment Success?}
+        P3 --> P4["Open Razorpay Modal with order_id, UPI, Cards"]
+        P4 --> P5{"Payment Success?"}
         P5 -->|No| P6["Show Payment Error to Buyer"]
-        P5 -->|Yes| P7["Client receives razorpay_payment_id & signature"]
+        P5 -->|Yes| P7["Client receives razorpay_payment_id and signature"]
         P7 --> P8["Server verifies cryptographic HMAC signature"]
         P8 --> P9["Persist verified order to database"]
         P9 --> P10["Trigger WhatsApp Notification to Artisan"]
@@ -473,7 +473,7 @@ flowchart TD
     subgraph ClientBrowser["Client Browser (Buyer & Artisan)"]
         UI_Buyer["Buyer Views & Actions"]
         UI_Artisan["Artisan Views & Actions"]
-        LS[("localStorage: 'cart'")]
+        LS[("Browser LocalStorage: cart")]
     end
 
     subgraph SupabasePlatform["Supabase Services (api.supabase.co)"]
@@ -481,7 +481,7 @@ flowchart TD
             AuthTokens["JWT Token & Session Storage"]
         end
         subgraph StorageAPI["Storage API (/storage/v1)"]
-            BucketImages[("Bucket: images")]
+            BucketImages[("Supabase Bucket: images")]
         end
         subgraph PostgRESTAPI["PostgREST API (/rest/v1)"]
             RLS["Row Level Security Check"]
@@ -495,22 +495,22 @@ flowchart TD
     end
 
     %% Buyer flows
-    UI_Buyer -- "1. Read Catalog (GET /products?select=*,artisans(...))" --> PostgRESTAPI
+    UI_Buyer -- "1. Read Catalog" --> PostgRESTAPI
     PostgRESTAPI --> RLS --> ProductsTable & ArtisansTable
     UI_Buyer -- "2. Add items to cart" --> LS
-    UI_Buyer -- "3. Guest Checkout (POST /orders & POST /order_items)" --> PostgRESTAPI
+    UI_Buyer -- "3. Guest Checkout (POST orders)" --> PostgRESTAPI
     PostgRESTAPI --> RLS --> OrdersTable & OrderItemsTable
-    UI_Buyer -- "4. View Order (GET /orders?id=eq & GET /order_items?order_id=eq)" --> PostgRESTAPI
+    UI_Buyer -- "4. View Order (GET orders)" --> PostgRESTAPI
 
     %% Artisan flows
-    UI_Artisan -- "5. Sign In / Up (POST /auth/v1/token)" --> AuthAPI
+    UI_Artisan -- "5. Sign In / Up" --> AuthAPI
     AuthAPI -- "Issues JWT" --> AuthTokens
-    UI_Artisan -- "6. Upload Photos & Audio (POST /storage/v1/object/images)" --> StorageAPI
+    UI_Artisan -- "6. Upload Photos & Audio" --> StorageAPI
     StorageAPI --> BucketImages
-    UI_Artisan -- "7. Upsert Profile (POST /artisans)" --> PostgRESTAPI
-    UI_Artisan -- "8. Insert/Update/Delete Product (POST/PATCH/DELETE /products)" --> PostgRESTAPI
-    UI_Artisan -- "9. Fetch Assigned Orders (GET /order_items?artisan_id=eq)" --> PostgRESTAPI
-    UI_Artisan -- "10. Update Status (PATCH /order_items?id=eq)" --> PostgRESTAPI
+    UI_Artisan -- "7. Upsert Profile" --> PostgRESTAPI
+    UI_Artisan -- "8. Manage Products (CRUD)" --> PostgRESTAPI
+    UI_Artisan -- "9. Fetch Assigned Orders" --> PostgRESTAPI
+    UI_Artisan -- "10. Update Status" --> PostgRESTAPI
 ```
 
 ---
@@ -527,50 +527,50 @@ erDiagram
     PRODUCTS ||--o{ ORDER_ITEMS : "referenced by"
 
     ARTISANS {
-        uuid id PK "References auth.users(id) ON DELETE CASCADE"
-        text name "Full name of the artisan"
-        text phone "WhatsApp or mobile phone"
-        text village "Village or town in coastal Karnataka"
-        text craft "Primary craft specialization"
-        text bio "Short autobiography and lineage"
-        text photo_url "URL to artisan portrait photo"
-        timestamptz created_at "Timestamp of registration"
+        uuid id PK
+        text name
+        text phone
+        text village
+        text craft
+        text bio
+        text photo_url
+        timestamptz created_at
     }
 
     PRODUCTS {
-        uuid id PK "default gen_random_uuid()"
-        uuid artisan_id FK "References artisans(id) ON DELETE CASCADE"
-        text title "Product name / title"
-        int price "Price in Indian Rupees (INR)"
-        text craft_type "Category from CRAFTS enum"
-        text description "Brief summary of the artifact"
-        text materials "Materials used in fabrication"
-        text time_taken "Time invested (e.g. '14 days')"
-        text story "Detailed craft story and heritage lore"
-        text voice_url "URL to recorded audio voice note"
-        text_array images "Array of image URLs default '{}'"
-        timestamptz created_at "Creation timestamp"
+        uuid id PK
+        uuid artisan_id FK
+        text title
+        int price
+        text craft_type
+        text description
+        text materials
+        text time_taken
+        text story
+        text voice_url
+        text_array images
+        timestamptz created_at
     }
 
     ORDERS {
-        uuid id PK "Generated client-side via crypto.randomUUID()"
-        text buyer_name "Name of the purchasing customer"
-        text buyer_phone "Customer phone / WhatsApp number"
-        text address "Physical delivery address"
-        int total "Order grand total in INR"
-        timestamptz created_at "Timestamp of order placement"
+        uuid id PK
+        text buyer_name
+        text buyer_phone
+        text address
+        int total
+        timestamptz created_at
     }
 
     ORDER_ITEMS {
-        uuid id PK "default gen_random_uuid()"
-        uuid order_id FK "References orders(id) ON DELETE CASCADE"
-        uuid product_id "Nullable UUID reference to product"
-        uuid artisan_id FK "References artisans(id)"
-        text title "Snapshot of product title at purchase"
-        int price "Snapshot of unit price at purchase"
-        int qty "Quantity ordered (default 1)"
-        text status "Check constraint: 'Placed','Accepted','Completed'"
-        timestamptz created_at "Timestamp of line item"
+        uuid id PK
+        uuid order_id FK
+        uuid product_id
+        uuid artisan_id FK
+        text title
+        int price
+        int qty
+        text status
+        timestamptz created_at
     }
 ```
 
