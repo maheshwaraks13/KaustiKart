@@ -1,0 +1,10 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+@layer base { body { @apply bg-cream text-ink text-base antialiased; } }
+@layer components {
+  .btn { @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold transition min-h-[48px]; }
+  .btn-primary { @apply bg-clay text-white hover:bg-claydark; }
+  .btn-ghost { @apply border-2 border-clay text-clay hover:bg-clay hover:text-white; }
+  .input { @apply w-full rounded-xl border border-sand bg-white px-4 py-3 text-base outline-none focus:border-clay; }
+  .label { @apply mb-1 block text-sm font-semibold; }
+  .card { @apply rounded-2xl bg-white p-4 shadow-sm border border-sand; }
+}
