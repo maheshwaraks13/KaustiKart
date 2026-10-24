@@ -1014,7 +1014,7 @@ This repository does not currently contain an explicit open-source `LICENSE` fil
 ## 25. Acknowledgements and Project Links
 
 - **Repository**: [https://github.com/maheshwaraks13/KaustiKart](https://github.com/maheshwaraks13/KaustiKart)
-- **Author / Maintainer**: [Maheshwara K S](https://github.com/maheshwaraks13)
+- **Author / Maintainer**: [Maheshwara K S](https://github.com/maheshwaraks13) ,[Dhanush](https://github.com/valarxdhn)
 - **Artisan Traditions Honored**:
   - **Kasuti Embroidery** — Kumta, Honnavar, and Dharwad lineages.
   - **Beedu Metal Inlay Craft** — Bhatkal and coastal metallurgical artisans.
